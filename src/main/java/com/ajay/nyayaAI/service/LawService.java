@@ -15,18 +15,21 @@ import java.util.*;
 public class LawService {
 
     /* ============================
+       🔹 COMMON
+       ============================ */
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final RestTemplate restTemplate = new RestTemplate();
+
+    /* ============================
        🔹 ML SERVICE CONFIG
        ============================ */
 
     private static final String ML_SERVICE_URL = "http://localhost:8000/predict";
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
-
     public List<SectionAnalysisResponse> predictSections(String complaint) {
 
         try {
-            RestTemplate restTemplate = new RestTemplate();
-
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
 
@@ -50,7 +53,7 @@ public class LawService {
                             new TypeReference<List<Map<String, Object>>>() {}
                     );
 
-            List<SectionAnalysisResponse> cleanedResults = new ArrayList<>();
+            List<SectionAnalysisResponse> results = new ArrayList<>();
 
             for (Map<String, Object> raw : rawResults) {
 
@@ -67,13 +70,13 @@ public class LawService {
                 dto.setMatchPercentage((int) Math.round(similarity * 100));
                 dto.setPunishment("As per IPC");
 
-                cleanedResults.add(dto);
+                results.add(dto);
             }
 
-            return cleanedResults;
+            return results;
 
         } catch (Exception e) {
-            throw new RuntimeException("Error calling ML service: " + e.getMessage());
+            throw new RuntimeException("Error calling ML service: " + e.getMessage(), e);
         }
     }
 
@@ -85,34 +88,32 @@ public class LawService {
     private String geminiApiKey;
 
     private static final String GEMINI_URL =
-            "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro:generateContent";
+            "https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent";
 
     public String getLawInfo(String query) {
 
         try {
-            RestTemplate restTemplate = new RestTemplate();
-
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
-            headers.setBearerAuth(geminiApiKey);
 
             String prompt =
-                    "Explain this in simple words for public legal awareness: " + query;
+                    "Explain this Indian law or legal term in simple, public-friendly language: " + query;
 
             Map<String, Object> part = Map.of("text", prompt);
             Map<String, Object> content = Map.of("parts", List.of(part));
-            Map<String, Object> requestBody =
-                    Map.of("contents", List.of(content));
+            Map<String, Object> requestBody = Map.of("contents", List.of(content));
 
             HttpEntity<Map<String, Object>> entity =
                     new HttpEntity<>(requestBody, headers);
 
+            String fullUrl = GEMINI_URL + "?key=" + geminiApiKey;
+
             ResponseEntity<String> response =
-                    restTemplate.postForEntity(GEMINI_URL, entity, String.class);
+                    restTemplate.postForEntity(fullUrl, entity, String.class);
 
             JsonNode root = objectMapper.readTree(response.getBody());
-
             JsonNode candidates = root.path("candidates");
+
             if (candidates.isArray() && candidates.size() > 0) {
                 JsonNode parts =
                         candidates.get(0).path("content").path("parts");
