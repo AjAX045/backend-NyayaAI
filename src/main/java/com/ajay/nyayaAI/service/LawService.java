@@ -16,9 +16,9 @@ public class LawService {
     @Value("${gemini.api.key}")
     private String geminiApiKey;
 
-    // Correct Gemini endpoint
+    // ✅ Updated endpoint for Gemini 2.5 Flash
     private static final String GEMINI_URL =
-            "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro:generateContent";
+            "https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent";
 
     public String getLawInfo(String query) {
         try {
@@ -26,23 +26,23 @@ public class LawService {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
 
-            // ✅ Use Bearer token for authentication
-            headers.setBearerAuth(geminiApiKey);
+            // Use API key in URL (not bearer)
+            String fullUrl = GEMINI_URL + "?key=" + geminiApiKey;
 
-            // Build the prompt
-            String promptText = "Explain this in simple words for public legal awareness: " + query;
+            // Prompt for explanation
+            String promptText = "Explain this Indian law or legal term in simple, public-friendly language: " + query;
 
-            // Build request body
+            // Request body
             Map<String, Object> part = Map.of("text", promptText);
-            Map<String, Object> contents = Map.of("parts", List.of(part));
-            Map<String, Object> requestBody = Map.of("contents", List.of(contents));
+            Map<String, Object> content = Map.of("parts", List.of(part));
+            Map<String, Object> requestBody = Map.of("contents", List.of(content));
 
             HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
 
-            // ✅ Correct call (no need to append API key to URL)
-            ResponseEntity<String> response = restTemplate.postForEntity(GEMINI_URL, entity, String.class);
+            // Send request
+            ResponseEntity<String> response = restTemplate.postForEntity(fullUrl, entity, String.class);
 
-            // Parse the response
+            // Parse JSON
             ObjectMapper mapper = new ObjectMapper();
             JsonNode root = mapper.readTree(response.getBody());
 
