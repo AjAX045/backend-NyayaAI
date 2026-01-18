@@ -31,3 +31,10 @@ build/
 
 ### VS Code ###
 .vscode/
+# ML artifacts
+nyayaai-ml-service/
+*.bin
+*.pt
+*.onnx
+*.pkl
+*.model
