@@ -32,9 +32,11 @@ build/
 ### VS Code ###
 .vscode/
 # ML artifacts
-nyayaai-ml-service/
-*.bin
-*.pt
-*.onnx
-*.pkl
-*.model
+# Ignore ML model artifacts only
+nyayaai-ml-service/legal_section_model/
+nyayaai-ml-service/*.pt
+nyayaai-ml-service/*.csv
+nyayaai-ml-service/*.bin
+nyayaai-ml-service/*.onnx
+nyayaai-ml-service/*.pkl
+nyayaai-ml-service/*.model

@@ -1,0 +1,56 @@
+[33mb23d3b4[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m Remove ML model artifacts from repository and update .gitignore
+ .gitignore | 7 [32m+++++++[m
+ 1 file changed, 7 insertions(+)
+[33m4d3a074[m Configured DB env setup, cleaned LawService, and updated backend config
+ .gitignore                                         |  2 [32m+[m[31m-[m
+ pom.xml                                            | 12 [32m+++++[m
+ .../java/com/ajay/nyayaAI/service/LawService.java  | 60 [32m+++++++++++++++++++[m[31m---[m
+ src/main/resources/application.properties          |  6 [32m+[m[31m--[m
+ 4 files changed, 70 insertions(+), 10 deletions(-)
+[33m2310d18[m Merged backend changes: FIR module, dashboard, ML & Gemini integration
+[33mfaf6886[m Integrated ML service and updated FIR section prediction flow
+ .../com/ajay/nyayaAI/controller/LawController.java |  36 [32m++++++[m[31m-[m
+ .../ajay/nyayaAI/dto/SectionAnalysisResponse.java  |  29 [32m++++++[m
+ .../java/com/ajay/nyayaAI/service/LawService.java  | 108 [32m+++++++++++++++++[m[31m----[m
+ src/main/resources/application.properties          |   2 [32m+[m[31m-[m
+ 4 files changed, 151 insertions(+), 24 deletions(-)
+[33m0a9e31c[m[33m ([m[1;31mfriend/main[m[33m)[m Added dashboard FIR APIs and database connection
+ pom.xml                                            |   20 [32m+[m[31m-[m
+ .../com/ajay/nyayaAI/controller/FirController.java |   46 [32m+[m
+ .../controller/PoliceDashboardController.java      |   75 [32m+[m
+ .../ajay/nyayaAI/controller/SectionController.java |   23 [32m+[m
+ src/main/java/com/ajay/nyayaAI/dto/FirListDto.java |   61 [32m+[m
+ .../ajay/nyayaAI/dto/PoliceDashboardStatsDto.java  |   26 [32m+[m
+ .../java/com/ajay/nyayaAI/dto/RecentFirDto.java    |   44 [32m+[m
+ src/main/java/com/ajay/nyayaAI/model/Fir.java      |  168 [32m++[m
+ .../com/ajay/nyayaAI/repository/DashboardRepo.java |   15 [32m+[m
+ .../com/ajay/nyayaAI/repository/FirRepository.java |    7 [32m+[m
+ .../java/com/ajay/nyayaAI/service/FirService.java  |   23 [32m+[m
+ .../com/ajay/nyayaAI/service/GeminiService.java    |   54 [32m+[m
+ .../java/com/ajay/nyayaAI/service/LawService.java  |   24 [32m+[m[31m-[m
+ .../com/ajay/nyayaAI/service/SectionService.java   |   45 [32m+[m
+ src/main/resources/application.properties          |   17 [32m+[m[31m-[m
+ src/main/resources/data/bns_sections.json          | 2054 [32m++++++++++++++++++++[m
+ 16 files changed, 2685 insertions(+), 17 deletions(-)
+[33m5ff1800[m[33m ([m[1;32mbackup-before-backend-merge[m[33m)[m Initial commit - Spring Boot backend for NyayaAI
+ .gitattributes                                     |   2 [32m+[m
+ .gitignore                                         |  33 [32m+++[m
+ .mvn/wrapper/maven-wrapper.properties              |   3 [32m+[m
+ bin/.gitattributes                                 |   2 [32m+[m
+ bin/.gitignore                                     |  33 [32m+++[m
+ bin/.mvn/wrapper/maven-wrapper.properties          |   3 [32m+[m
+ bin/mvnw                                           | 295 [32m+++++++++++++++++++++[m
+ bin/mvnw.cmd                                       | 189 [32m+++++++++++++[m
+ bin/pom.xml                                        |  94 [32m+++++++[m
+ .../java/com/ajay/nyayaAI/NyayaAiApplication.class | Bin [31m0[m -> [32m1452[m bytes
+ bin/src/main/resources/application.properties      |   1 [32m+[m
+ .../com/ajay/nyayaAI/NyayaAiApplicationTests.class | Bin [31m0[m -> [32m1258[m bytes
+ mvnw                                               | 295 [32m+++++++++++++++++++++[m
+ mvnw.cmd                                           | 189 [32m+++++++++++++[m
+ pom.xml                                            |  94 [32m+++++++[m
+ .../java/com/ajay/nyayaAI/NyayaAiApplication.java  |  13 [32m+[m
+ .../com/ajay/nyayaAI/controller/LawController.java |  19 [32m++[m
+ .../java/com/ajay/nyayaAI/service/LawService.java  |  64 [32m+++++[m
+ src/main/resources/application.properties          |   3 [32m+[m
+ .../com/ajay/nyayaAI/NyayaAiApplicationTests.java  |  13 [32m+[m
+ 20 files changed, 1345 insertions(+)

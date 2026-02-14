@@ -38,14 +38,13 @@ public class LawController {
     /**
      * 🔹 Gemini-based Law Explanation
      */
-    @GetMapping("/ask")
-    public ResponseEntity<String> askLaw(@RequestParam String query) {
+@GetMapping("/ask")
+public ResponseEntity<String> askLaw(@RequestParam(required = false) String query) {
 
-        if (query == null || query.trim().isEmpty()) {
-            return ResponseEntity.badRequest().body("Query is required");
-        }
-
-        String response = lawService.getLawInfo(query);
-        return ResponseEntity.ok(response);
+    if (query == null || query.trim().isEmpty()) {
+        return ResponseEntity.badRequest().body("Query is required");
     }
+
+    return ResponseEntity.ok(lawService.getLawInfo(query));
+}
 }

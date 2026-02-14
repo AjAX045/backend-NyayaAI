@@ -5,8 +5,10 @@ import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import jakarta.persistence.PrePersist;
-
+import java.time.LocalTime;
+import java.time.format.TextStyle;
+import java.util.List;
+import java.util.Locale;
 
 @Entity
 @Table(name = "firs")
@@ -21,7 +23,25 @@ public class Fir {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Complainant details
+    // ===============================
+    // FIR Basic Details
+    // ===============================
+
+    @Column(nullable = false)
+    private String district;
+
+    @Column(nullable = false)
+    private String policeStation;
+
+    private Integer year;
+
+    // 🔹 Auto-derived from incidentDate
+    private String day;
+
+    // ===============================
+    // Complainant Details
+    // ===============================
+
     @Column(nullable = false)
     private String complainantName;
 
@@ -31,15 +51,24 @@ public class Fir {
     @Column(nullable = false)
     private String address;
 
-    // Incident details
+    private String occupation;
+
+    private String relationToVictim;
+
+    // ===============================
+    // Incident Details
+    // ===============================
+
     @Column(nullable = false)
     private LocalDate incidentDate;
 
     @Column(nullable = false)
-    private String incidentTime;
+    private LocalTime incidentTime;
 
     @Column(nullable = false)
     private String location;
+
+    private String placeOfOccurrence;
 
     @Column(nullable = false)
     private String incidentType;
@@ -47,122 +76,49 @@ public class Fir {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String complaintText;
 
+    // ===============================
     // AI Prediction
+    // ===============================
+
     @Column(columnDefinition = "TEXT")
     private String predictedSections;
-    
+
     @Column(nullable = false)
     private String status;
 
+    // ===============================
+    // One FIR → Many Accused
+    // ===============================
 
+    @OneToMany(mappedBy = "fir", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Accused> accusedList;
+
+    // ===============================
     // Metadata
+    // ===============================
+
     private LocalDateTime createdAt;
-    
+
+    // ===============================
+    // Lifecycle Hooks
+    // ===============================
+
     @PrePersist
-    public void onCreate() {
-        this.createdAt = java.time.LocalDateTime.now();
+    @PreUpdate
+    public void onSave() {
+
+        this.createdAt = (this.createdAt == null) ? LocalDateTime.now() : this.createdAt;
+        this.year = (this.year == null) ? LocalDate.now().getYear() : this.year;
+
         if (this.status == null) {
             this.status = "PENDING";
-          }
+        }
+
+        // 🔥 Auto-calculate Day from incidentDate
+        if (this.incidentDate != null) {
+            this.day = this.incidentDate
+                    .getDayOfWeek()
+                    .getDisplayName(TextStyle.FULL, Locale.ENGLISH);
+        }
     }
-
-	public String getStatus() {
-		return status;
-	}
-
-	public void setStatus(String status) {
-		this.status = status;
-	}
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-	public String getComplainantName() {
-		return complainantName;
-	}
-
-	public void setComplainantName(String complainantName) {
-		this.complainantName = complainantName;
-	}
-
-	public String getContactNumber() {
-		return contactNumber;
-	}
-
-	public void setContactNumber(String contactNumber) {
-		this.contactNumber = contactNumber;
-	}
-
-	public String getAddress() {
-		return address;
-	}
-
-	public void setAddress(String address) {
-		this.address = address;
-	}
-
-	public LocalDate getIncidentDate() {
-		return incidentDate;
-	}
-
-	public void setIncidentDate(LocalDate incidentDate) {
-		this.incidentDate = incidentDate;
-	}
-
-	public String getIncidentTime() {
-		return incidentTime;
-	}
-
-	public void setIncidentTime(String incidentTime) {
-		this.incidentTime = incidentTime;
-	}
-
-	public String getLocation() {
-		return location;
-	}
-
-	public void setLocation(String location) {
-		this.location = location;
-	}
-
-	public String getIncidentType() {
-		return incidentType;
-	}
-
-	public void setIncidentType(String incidentType) {
-		this.incidentType = incidentType;
-	}
-
-	public String getComplaintText() {
-		return complaintText;
-	}
-
-	public void setComplaintText(String complaintText) {
-		this.complaintText = complaintText;
-	}
-
-	public String getPredictedSections() {
-		return predictedSections;
-	}
-
-	public void setPredictedSections(String predictedSections) {
-		this.predictedSections = predictedSections;
-	}
-
-	public LocalDateTime getCreatedAt() {
-		return createdAt;
-	}
-
-	public void setCreatedAt(LocalDateTime createdAt) {
-		this.createdAt = createdAt;
-	}
-    
-    
-
 }
-

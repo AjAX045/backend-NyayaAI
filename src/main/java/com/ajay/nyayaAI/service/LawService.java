@@ -22,7 +22,7 @@ public class LawService {
     private final RestTemplate restTemplate = new RestTemplate();
 
     /* ============================
-       🔹 ML SERVICE CONFIG
+       🔹 ML SERVICE CONFIG  (⚠️ UNCHANGED)
        ============================ */
 
     private static final String ML_SERVICE_URL = "http://localhost:8000/predict";
@@ -78,7 +78,7 @@ public class LawService {
                         Double.parseDouble(String.valueOf(raw.get("similarity")));
                 dto.setMatchPercentage((int) Math.round(similarity * 100));
 
-                dto.setPunishment("As per IPC");
+                dto.setPunishment("As per BNS");
 
                 results.add(dto);
             }
@@ -109,7 +109,7 @@ public class LawService {
         String summary = sentences[0];
 
         // Limit word count
-        int maxWords = 22;
+        int maxWords = 40;
         String[] words = summary.split(" ");
 
         if (words.length > maxWords) {
@@ -121,12 +121,13 @@ public class LawService {
     }
 
     /* ============================
-       🔹 GEMINI CONFIG
+       🔹 GEMINI CONFIG (✅ FIXED)
        ============================ */
 
     @Value("${gemini.api.key}")
     private String geminiApiKey;
 
+    // ✅ Correct Gemini 2.5 Flash endpoint
     private static final String GEMINI_URL =
             "https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent";
 
@@ -140,17 +141,19 @@ public class LawService {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
 
-            String prompt =
+            // API key in URL (not Authorization header)
+            String fullUrl = GEMINI_URL + "?key=" + geminiApiKey;
+
+            String promptText =
                     "Explain this Indian law or legal term in simple, public-friendly language: " + query;
 
-            Map<String, Object> part = Map.of("text", prompt);
+            // Gemini request body
+            Map<String, Object> part = Map.of("text", promptText);
             Map<String, Object> content = Map.of("parts", List.of(part));
             Map<String, Object> requestBody = Map.of("contents", List.of(content));
 
             HttpEntity<Map<String, Object>> entity =
                     new HttpEntity<>(requestBody, headers);
-
-            String fullUrl = GEMINI_URL + "?key=" + geminiApiKey;
 
             ResponseEntity<String> response =
                     restTemplate.postForEntity(fullUrl, entity, String.class);
@@ -159,21 +162,36 @@ public class LawService {
                 return "No response from Gemini";
             }
 
+            // Parse response JSON
             JsonNode root = objectMapper.readTree(response.getBody());
             JsonNode candidates = root.path("candidates");
 
             if (candidates.isArray() && candidates.size() > 0) {
-                JsonNode parts =
+                JsonNode partsNode =
                         candidates.get(0).path("content").path("parts");
-                if (parts.isArray() && parts.size() > 0) {
-                    return parts.get(0).path("text").asText();
+                if (partsNode.isArray() && partsNode.size() > 0) {
+                    return partsNode.get(0).path("text").asText();
                 }
             }
 
             return "No valid response from Gemini";
 
         } catch (Exception e) {
-            return "Error fetching law info";
+
+            String msg = e.getMessage() == null ? "" : e.getMessage();
+
+            // Auth / API key issues
+            if (msg.contains("401") || msg.contains("403")) {
+                return "Service is temporarily unavailable due to authentication issues.";
+            }
+
+            // Timeout / network
+            if (msg.toLowerCase().contains("timeout")) {
+                return "The request took too long. Please try again.";
+            }
+
+            // Generic fallback
+            return "Something went wrong while fetching legal information.";
         }
     }
 }

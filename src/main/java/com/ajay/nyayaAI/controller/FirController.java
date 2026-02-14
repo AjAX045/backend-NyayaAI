@@ -1,12 +1,16 @@
 package com.ajay.nyayaAI.controller;
 
+import com.ajay.nyayaAI.model.Accused;
 import com.ajay.nyayaAI.model.Fir;
 import com.ajay.nyayaAI.service.FirService;
 
-import java.time.LocalDate;
-import java.util.Map;
-
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+
 
 @RestController
 @RequestMapping("/api/firs")
@@ -20,27 +24,39 @@ public class FirController {
     }
 
     @PostMapping
-    public Fir createFir(@RequestBody Map<String, Object> firData) {
-        Fir fir = new Fir();
+    public Fir createFir(@RequestBody Fir fir) {
 
-        // Map FIR form fields
-        fir.setComplainantName((String) firData.get("complainantName"));
-        fir.setContactNumber((String) firData.get("contactNumber"));
-        fir.setAddress((String) firData.get("address"));
-        fir.setIncidentDate(LocalDate.parse((String) firData.get("incidentDate")));
-        fir.setIncidentTime((String) firData.get("incidentTime"));
-        fir.setLocation((String) firData.get("location"));
-        fir.setIncidentType((String) firData.get("incidentType"));
-        fir.setComplaintText((String) firData.get("complaintText"));
-
-        // Save only accepted/corrected predicted sections
-        Object predictedSections = firData.get("predictedSections");
-        if (predictedSections != null) {
-            // Convert to string (JSON) before saving
-            fir.setPredictedSections(predictedSections.toString());
+        // Attach FIR reference to each accused
+        if (fir.getAccusedList() != null) {
+            for (Accused accused : fir.getAccusedList()) {
+                accused.setFir(fir);
+            }
         }
 
         return firService.saveFir(fir);
     }
 
+@GetMapping("/{id}/pdf")
+public ResponseEntity<byte[]> generatePdf(@PathVariable Long id) {
+
+    Fir fir = firService.getFirById(id);
+
+    RestTemplate restTemplate = new RestTemplate();
+
+    String pythonServiceUrl = "http://127.0.0.1:8000/generate-fir-pdf" ;
+
+    HttpHeaders headers = new HttpHeaders();
+    headers.setContentType(MediaType.APPLICATION_JSON);
+
+    HttpEntity<Fir> request = new HttpEntity<>(fir, headers);
+
+    ResponseEntity<byte[]> response =
+            restTemplate.postForEntity(pythonServiceUrl, request, byte[].class);
+
+    return ResponseEntity.ok()
+            .header(HttpHeaders.CONTENT_DISPOSITION,
+                    "attachment; filename=FIR_" + fir.getId() + ".pdf")
+            .contentType(MediaType.APPLICATION_PDF)
+            .body(response.getBody());
+}
 }
