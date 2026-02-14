@@ -40,3 +40,7 @@ nyayaai-ml-service/*.bin
 nyayaai-ml-service/*.onnx
 nyayaai-ml-service/*.pkl
 nyayaai-ml-service/*.model
+
+# Python cache
+__pycache__/
+*.pyc
