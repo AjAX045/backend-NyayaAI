@@ -10,11 +10,14 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import com.ajay.nyayaAI.security.CustomUserDetails;
+
 
 
 @RestController
 @RequestMapping("/api/firs")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
 public class FirController {
 
     private final FirService firService;
@@ -26,6 +29,16 @@ public class FirController {
     @PostMapping
     public Fir createFir(@RequestBody Fir fir) {
 
+        // 🔐 Get logged-in officer
+        CustomUserDetails userDetails =
+            (CustomUserDetails) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal();
+
+        // ✅ Assign police station automatically
+        fir.setPoliceStation(userDetails.getPoliceStation());
+
         // Attach FIR reference to each accused
         if (fir.getAccusedList() != null) {
             for (Accused accused : fir.getAccusedList()) {
@@ -35,6 +48,7 @@ public class FirController {
 
         return firService.saveFir(fir);
     }
+
 
 @GetMapping("/{id}/pdf")
 public ResponseEntity<byte[]> generatePdf(@PathVariable Long id) {

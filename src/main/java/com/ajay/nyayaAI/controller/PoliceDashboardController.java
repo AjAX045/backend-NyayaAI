@@ -7,6 +7,9 @@ import com.ajay.nyayaAI.dto.RecentFirDto;
 import com.ajay.nyayaAI.model.Fir;
 import com.ajay.nyayaAI.repository.DashboardRepo;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
+import com.ajay.nyayaAI.security.CustomUserDetails;
+
 
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/police/dashboard")
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
 public class PoliceDashboardController {
 
     private final DashboardRepo firRepository;
@@ -26,9 +29,13 @@ public class PoliceDashboardController {
     @GetMapping("/stats")
     public PoliceDashboardStatsDto getDashboardStats() {
 
-        long total = firRepository.count();
-        long pending = firRepository.countByStatus("PENDING");
-        long solved = firRepository.countByStatus("SOLVED");
+    	String station = getLoggedInStation();
+
+    	long total = firRepository.countByPoliceStation(station);
+    	long pending = firRepository.countByPoliceStationAndStatus(station, "PENDING");
+    	long solved = firRepository.countByPoliceStationAndStatus(station, "SOLVED");
+
+
 
         return new PoliceDashboardStatsDto(total, pending, solved);
     }
@@ -36,7 +43,11 @@ public class PoliceDashboardController {
     @GetMapping("/recent-firs")
     public List<RecentFirDto> getRecentFirs() {
 
-        List<Fir> firs = firRepository.findTop5ByOrderByCreatedAtDesc();
+    	String station = getLoggedInStation();
+
+    	List<Fir> firs =
+    	    firRepository.findTop5ByPoliceStationOrderByCreatedAtDesc(station);
+
 
         return firs.stream()
                 .map(fir -> new RecentFirDto(
@@ -67,8 +78,26 @@ public class PoliceDashboardController {
     @GetMapping("/all-firs")
     public List<Fir> getAllFirs() {
         // Optional: you can sort by createdAt descending
-        return firRepository.findAll(Sort.by(Sort.Direction.DESC, "createdAt"));
+       // return firRepository.findAll(Sort.by(Sort.Direction.DESC, "createdAt"));
+    	String station = getLoggedInStation();
+
+    	return firRepository.findByPoliceStation(
+    	        station,
+    	        Sort.by(Sort.Direction.DESC, "createdAt")
+    	);
+
     }
+    
+    private String getLoggedInStation() {
+        CustomUserDetails userDetails =
+            (CustomUserDetails) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal();
+
+        return userDetails.getPoliceStation();
+    }
+
 
 
 

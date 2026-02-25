@@ -11,7 +11,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/laws")
-@CrossOrigin("*")
+@CrossOrigin(origins = "http://localhost:3000")
 public class LawController {
 
     @Autowired
@@ -38,13 +38,13 @@ public class LawController {
     /**
      * 🔹 Gemini-based Law Explanation
      */
-@GetMapping("/ask")
-public ResponseEntity<String> askLaw(@RequestParam(required = false) String query) {
-
-    if (query == null || query.trim().isEmpty()) {
-        return ResponseEntity.badRequest().body("Query is required");
-    }
-
-    return ResponseEntity.ok(lawService.getLawInfo(query));
-}
+	@GetMapping("/ask")
+	public ResponseEntity<String> askLaw(@RequestParam(required = false) String query) {
+	
+	    if (query == null || query.trim().isEmpty()) {
+	        return ResponseEntity.badRequest().body("Query is required");
+	    }
+	
+	    return ResponseEntity.ok(lawService.getLawInfo(query));
+	}
 }

@@ -19,7 +19,167 @@ import java.util.Locale;
 @Builder
 public class Fir {
 
-    @Id
+    public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public String getDistrict() {
+		return district;
+	}
+
+	public void setDistrict(String district) {
+		this.district = district;
+	}
+
+	public String getPoliceStation() {
+		return policeStation;
+	}
+
+	public void setPoliceStation(String policeStation) {
+		this.policeStation = policeStation;
+	}
+
+	public Integer getYear() {
+		return year;
+	}
+
+	public void setYear(Integer year) {
+		this.year = year;
+	}
+
+	public String getDay() {
+		return day;
+	}
+
+	public void setDay(String day) {
+		this.day = day;
+	}
+
+	public String getComplainantName() {
+		return complainantName;
+	}
+
+	public void setComplainantName(String complainantName) {
+		this.complainantName = complainantName;
+	}
+
+	public String getContactNumber() {
+		return contactNumber;
+	}
+
+	public void setContactNumber(String contactNumber) {
+		this.contactNumber = contactNumber;
+	}
+
+	public String getAddress() {
+		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
+	}
+
+	public String getOccupation() {
+		return occupation;
+	}
+
+	public void setOccupation(String occupation) {
+		this.occupation = occupation;
+	}
+
+	public String getRelationToVictim() {
+		return relationToVictim;
+	}
+
+	public void setRelationToVictim(String relationToVictim) {
+		this.relationToVictim = relationToVictim;
+	}
+
+	public LocalDate getIncidentDate() {
+		return incidentDate;
+	}
+
+	public void setIncidentDate(LocalDate incidentDate) {
+		this.incidentDate = incidentDate;
+	}
+
+	public LocalTime getIncidentTime() {
+		return incidentTime;
+	}
+
+	public void setIncidentTime(LocalTime incidentTime) {
+		this.incidentTime = incidentTime;
+	}
+
+	public String getLocation() {
+		return location;
+	}
+
+	public void setLocation(String location) {
+		this.location = location;
+	}
+
+	public String getPlaceOfOccurrence() {
+		return placeOfOccurrence;
+	}
+
+	public void setPlaceOfOccurrence(String placeOfOccurrence) {
+		this.placeOfOccurrence = placeOfOccurrence;
+	}
+
+	public String getIncidentType() {
+		return incidentType;
+	}
+
+	public void setIncidentType(String incidentType) {
+		this.incidentType = incidentType;
+	}
+
+	public String getComplaintText() {
+		return complaintText;
+	}
+
+	public void setComplaintText(String complaintText) {
+		this.complaintText = complaintText;
+	}
+
+	public String getPredictedSections() {
+		return predictedSections;
+	}
+
+	public void setPredictedSections(String predictedSections) {
+		this.predictedSections = predictedSections;
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
+	public List<Accused> getAccusedList() {
+		return accusedList;
+	}
+
+	public void setAccusedList(List<Accused> accusedList) {
+		this.accusedList = accusedList;
+	}
+
+	public LocalDateTime getCreatedAt() {
+		return createdAt;
+	}
+
+	public void setCreatedAt(LocalDateTime createdAt) {
+		this.createdAt = createdAt;
+	}
+
+	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 

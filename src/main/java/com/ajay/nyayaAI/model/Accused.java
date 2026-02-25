@@ -20,7 +20,39 @@ public class Accused {
 
     private String address;
 
-    @ManyToOne
+    public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getAddress() {
+		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
+	}
+
+	public Fir getFir() {
+		return fir;
+	}
+
+	public void setFir(Fir fir) {
+		this.fir = fir;
+	}
+
+	@ManyToOne
     @JoinColumn(name = "fir_id")
     @JsonIgnore
     private Fir fir;
